@@ -14,30 +14,57 @@ class MyApp extends StatefulWidget {
 }
 
 class _State extends State<MyApp> {
+
+  MapController mapController;
+  Map<String, LatLng> coords;
+  List<Marker> markers;
+  final _urlTemplate =  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+
+  @override
+  void initState() {
+    mapController = new MapController();
+
+    coords = new Map<String, LatLng>();
+    coords.putIfAbsent("Chicago", () => new LatLng(41.8781, -87.6298));
+    coords.putIfAbsent("Detroit", () => new LatLng(42.3314, -83.0458));
+    coords.putIfAbsent("Lansing", () => new LatLng(42.7325, -84.5555));
+
+    markers = new List<Marker>();
+    
+    for(var i = 0; i < coords.length; i++) {
+      markers.add(
+        new Marker(
+          width: 80.0,
+          height: 80.0,
+          point: coords.values.elementAt(i),
+          builder: (ctx) => new Icon(Icons.pin_drop, color: Colors.red),
+        )
+      );
+    }
+  }
+
+  void _showCoord(int index) {
+    mapController.move(coords.values.elementAt(index), 10.0);
+  }
+
+  List<Widget> _makeButtons() {
+    List<Widget> list = new List<Widget>();
+
+    for(int i = 0; i < coords.length; i++) {
+      list.add(
+        new RaisedButton(
+          onPressed: () => _showCoord(i),
+          child: new Text(coords.keys.elementAt(i))
+        ),
+      );
+    }
+
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    var markers = <Marker>[
-      new Marker(
-        width: 80.0,
-        height: 80.0,
-        point: new LatLng(41.8781, -87.6298),
-        builder: (ctx) => new Icon(Icons.person_pin_circle, color: Colors.red),
-      ),
-      new Marker(
-        width: 80.0,
-        height: 80.0,
-        point: new LatLng(42.3314, -83.0458),
-        builder: (ctx) => new Icon(Icons.person_pin_circle, color: Colors.red),
-      ),
-      new Marker(
-        width: 80.0,
-        height: 80.0,
-        point: new LatLng(42.7325, -84.5555),
-        builder: (ctx) => new Icon(Icons.person_pin_circle, color: Colors.red),
-      ),
-    ];
-
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Interactive Maps'),
@@ -47,15 +74,17 @@ class _State extends State<MyApp> {
         child: new Center(
           child: new Column(
             children: <Widget>[
+              new Row(children: _makeButtons(),),
               new Flexible(
                 child: new FlutterMap(
+                  mapController: mapController,
                   options: new MapOptions(
                     center: new LatLng(41.8781, -87.6298),
                     zoom: 5.0
                   ),
                   layers: [
                     new TileLayerOptions(
-                      urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      urlTemplate: _urlTemplate,
                       subdomains: ['a','b','c'],
                     ),
                     new MarkerLayerOptions(

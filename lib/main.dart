@@ -12,29 +12,67 @@ class MyApp extends StatefulWidget {
 }
 
 class _State extends State<MyApp> {
+
+  double _x;
+  double _y;
+  double _z;
+
+
+  @override
+  void initState() {
+    _x = 0.0;
+    _y = 0.0;
+    _z = 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Box Decoration'),
+        title: new Text('Transformations'),
       ),
       body: new Container(
         padding: new EdgeInsets.all(32.0),
         child: new Center(
           child: new Column(
             children: <Widget>[
-              new Text('Rick and Morty'),
-              new Container(
-                child: new Image(
-                  image: new AssetImage('images/rick.jpg'),
-                ),
-                padding: new EdgeInsets.all(62.0),
-                decoration: new BoxDecoration(
-                  border: new Border.all(
-                    color: Colors.orange, width: 3.0
-                  ),
-                  gradient: new RadialGradient(
-                    colors: <Color>[Colors.red, Colors.blue]
+              new Row(
+                children: <Widget>[
+                  new Text('X'),
+                  new Slider(
+                    value: _x,
+                    onChanged: (double value) => setState(() => _x = value),
+                  )
+                ],
+              ),
+              new Row(
+                children: <Widget>[
+                  new Text('Y'),
+                  new Slider(
+                    value: _y,
+                    onChanged: (double value) => setState(() => _y = value),
+                  )
+                ],
+              ),
+              new Row(
+                children: <Widget>[
+                  new Text('Z'),
+                  new Slider(
+                    value: _z,
+                    onChanged: (double value) => setState(() => _z = value),
+                  )
+                ],
+              ),
+              new Transform(
+                transform: new Matrix4.skewY(_y),
+                child: new Transform(
+                  transform: new Matrix4.skewX(_x),
+                  child: new Transform(
+                    transform: new Matrix4.rotationZ(_z),
+                    child: new Padding(
+                      padding: new EdgeInsets.all(10.0),
+                      child: new Text('Hello World!'),
+                    ),
                   ),
                 ),
               ),

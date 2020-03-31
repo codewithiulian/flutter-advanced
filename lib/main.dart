@@ -16,6 +16,28 @@ class MyApp extends StatefulWidget {
 class _State extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+
+    var markers = <Marker>[
+      new Marker(
+        width: 80.0,
+        height: 80.0,
+        point: new LatLng(41.8781, -87.6298),
+        builder: (ctx) => new Icon(Icons.person_pin_circle, color: Colors.red),
+      ),
+      new Marker(
+        width: 80.0,
+        height: 80.0,
+        point: new LatLng(42.3314, -83.0458),
+        builder: (ctx) => new Icon(Icons.person_pin_circle, color: Colors.red),
+      ),
+      new Marker(
+        width: 80.0,
+        height: 80.0,
+        point: new LatLng(42.7325, -84.5555),
+        builder: (ctx) => new Icon(Icons.person_pin_circle, color: Colors.red),
+      ),
+    ];
+
     return new Scaffold(
       appBar: new AppBar(
         title: new Text('Interactive Maps'),
@@ -29,13 +51,16 @@ class _State extends State<MyApp> {
                 child: new FlutterMap(
                   options: new MapOptions(
                     center: new LatLng(41.8781, -87.6298),
-                    zoom: 12.0
+                    zoom: 5.0
                   ),
                   layers: [
                     new TileLayerOptions(
                       urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                       subdomains: ['a','b','c'],
-                    )
+                    ),
+                    new MarkerLayerOptions(
+                      markers: markers
+                    ),
                   ],
                 ),
               ),

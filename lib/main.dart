@@ -12,44 +12,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _State extends State<MyApp> {
-
-  int _turns;
-  double _value;
-
-
-  @override
-  void initState() {
-    _turns = 0;
-    _value = 0.0;
-  }
-
-  void _onChanged(double value) {
-    setState(() {
-      _value = value;
-      _turns = value.toInt();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Rotated box'),
+        title: new Text('Box Decoration'),
       ),
       body: new Container(
         padding: new EdgeInsets.all(32.0),
         child: new Center(
           child: new Column(
             children: <Widget>[
-              new Slider(
-                value: _value,
-                onChanged: _onChanged,
-                min: 0.0,
-                max: 4.0
-              ),
-              new RotatedBox(
-                quarterTurns: _turns,
-                child: new Text('Hello World')
+              new Text('Rick and Morty'),
+              new Container(
+                child: new Image(
+                  image: new AssetImage('images/rick.jpg'),
+                ),
+                padding: new EdgeInsets.all(62.0),
+                decoration: new BoxDecoration(
+                  border: new Border.all(
+                    color: Colors.orange, width: 3.0
+                  ),
+                  gradient: new RadialGradient(
+                    colors: <Color>[Colors.red, Colors.blue]
+                  ),
+                ),
               ),
             ]
           ),

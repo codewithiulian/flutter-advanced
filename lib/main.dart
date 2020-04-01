@@ -41,6 +41,28 @@ class _State extends State<MyApp> {
     }
   }
 
+  void _signInGoogle() async {
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      idToken: googleAuth.idToken,
+      accessToken: googleAuth.accessToken
+    );
+
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+
+    if(user != null && !user.isAnonymous) {
+      setState(() {
+        _status = 'Signed in with Google';
+      });
+    } else {
+      setState(() {
+        _status = 'Google sign in failed.';
+      });
+    }
+  }
+
   void _signOut() async {
     await _auth.signOut();
     setState(() {
@@ -60,19 +82,17 @@ class _State extends State<MyApp> {
           child: new Column(
             children: <Widget>[
               new Text(_status),
-              new Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  new RaisedButton(
-                    onPressed: _signOut,
-                    child: new Text('Sign out'),
-                  ),
-                  new RaisedButton(
-                    onPressed: _signInAnon,
-                    child: new Text('Sign in anonymously'),
-                  ),
-                ],
+              new RaisedButton(
+                onPressed: _signOut,
+                child: new Text('Sign out'),
+              ),
+              new RaisedButton(
+                onPressed: _signInAnon,
+                child: new Text('Sign in anonymously'),
+              ),
+              new RaisedButton(
+                onPressed: _signInGoogle,
+                child: new Text('Sign in Google'),
               ),
             ]
           ),

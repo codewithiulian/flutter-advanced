@@ -42,3 +42,36 @@ Future<Null> setCounter(int value) async {
     }
   }
 }
+
+Future<Null> addData(String user) async {
+  DatabaseReference messageRef =
+    FirebaseDatabase.instance.reference().child('messages/$user');
+  for(int i = 0; i < 20; i++) {
+    messageRef
+        .update(<String, String>{'Key${i.toString()}' : 'Body${i.toString()}'});
+  }
+}
+
+Future<Null> removeData(String user) async {
+  DatabaseReference messageRef =
+  FirebaseDatabase.instance.reference().child('messages/$user');
+  for(int i = 0; i < 20; i++) {
+    await messageRef.remove();
+  }
+}
+
+Future<Null> setData(String user, String key, String value) async {
+  DatabaseReference messageRef =
+  FirebaseDatabase.instance.reference().child('messages/$user');
+  for(int i = 0; i < 20; i++) {
+    messageRef.set(<String, String>{key : value});
+  }
+}
+
+Future<Null> updateData(String user, String key, String value) async {
+  DatabaseReference messageRef =
+  FirebaseDatabase.instance.reference().child('messages/$user');
+  for(int i = 0; i < 20; i++) {
+    messageRef.update(<String, String>{key : value});
+  }
+}

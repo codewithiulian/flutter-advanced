@@ -31,9 +31,7 @@ void main() async {
     storageBucket: 'gs://fir-app-eb02c.appspot.com' // Firebase > Storage
   );
 
-  final FirebaseDatabase database = new FirebaseDatabase(
-    app: app
-  );
+  final FirebaseDatabase database = new FirebaseDatabase(app: app);
 
   runApp(new MaterialApp(
     home: new MyApp(app: app, database: database, storage: storage,),
@@ -60,6 +58,8 @@ class _State extends State<MyApp> {
   String _location;
   StreamSubscription<Event> _counterSubscription;
 
+  String _username;
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +82,7 @@ class _State extends State<MyApp> {
 
   void _signIn() async {
     if(await fbAuth.signInGoogle()) {
+      _username = await fbAuth.getUserId();
       setState(() {
         _status = 'Signed in';
       });
@@ -93,31 +94,31 @@ class _State extends State<MyApp> {
     }
   }
 
-  void _upload() async {
-    Directory systemTempDir = Directory.systemTemp;
-    File file = await File('${systemTempDir.path}/foo.txt').create();
-    await file.writeAsString('Hello world');
-
-    String location = await fbStorage.upload(file, basename(file.path));
-
+  void _addData() async {
+    fbDatabase.addData(_username);
     setState(() {
-      _location = location;
-      _status = 'Uploaded';
+      _status = 'Data added';
     });
   }
 
-  void _download() async {
-    if(_location == null) {
-      setState(() {
-        _status = 'Please upload first!';
-      });
-      return;
-    }
-
-    Uri location = Uri.parse('https://firebasestorage.googleapis.com/v0/b/fir-app-eb02c.appspot.com/o/file%2Ftest%2Ffoo.txt?alt=media&token=02a6ab86-a2c2-4fe0-868a-7083bc2c657c');
-    String data = await fbStorage.download(location);
+  void _removeData() async {
+    fbDatabase.removeData(_username);
     setState(() {
-      _status = 'Downloaded: $data';
+      _status = 'Data removed';
+    });
+  }
+
+  void _setData(String key, String value) async {
+    fbDatabase.setData(_username, key, value);
+    setState(() {
+      _status = 'Data set';
+    });
+  }
+
+  void _updateData(String key, String value) async {
+    fbDatabase.updateData(_username, key, value);
+    setState(() {
+      _status = 'Data updated';
     });
   }
 
@@ -138,16 +139,6 @@ class _State extends State<MyApp> {
     });
   }
 
-  void _increment() async {
-    int value = fbDatabase.counter + 1;
-    fbDatabase.setCounter(value);
-  }
-
-  void _decrement() async {
-    int value = fbDatabase.counter - 1;
-    fbDatabase.setCounter(value);
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -160,8 +151,9 @@ class _State extends State<MyApp> {
           child: new Column(
             children: <Widget>[
               new Text(_status),
-              new Text('Counter ${fbDatabase.counter}'),
-              new Text('Error: ${fbDatabase.error}'),
+              new Visibility(
+                child: new Text('${fbDatabase.error}'),
+                visible: fbDatabase.error != null,),
               new RaisedButton(
                 onPressed: _signOut,
                 child: new Text('Sign out'),
@@ -181,12 +173,12 @@ class _State extends State<MyApp> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   new RaisedButton(
-                    onPressed: _upload,
-                    child: new Text('Upload'),
+                    onPressed: _addData,
+                    child: new Text('Add Data'),
                   ),
                   new RaisedButton(
-                    onPressed: _download,
-                    child: new Text('Download'),
+                    onPressed: _removeData,
+                    child: new Text('Remove Data'),
                   ),
                 ],
               ),
@@ -195,12 +187,12 @@ class _State extends State<MyApp> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   new RaisedButton(
-                    onPressed: _increment,
-                    child: new Text('Increment'),
+                    onPressed: () => _setData('Key2', 'This is a set value'),
+                    child: new Text('Set Data'),
                   ),
                   new RaisedButton(
-                    onPressed: _decrement,
-                    child: new Text('Decrement'),
+                    onPressed: () => _updateData('Key2', 'Key2 has been updated'),
+                    child: new Text('Update Data'),
                   ),
                 ],
               ),

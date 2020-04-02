@@ -37,4 +37,9 @@ Future<bool> signInGoogle() async {
   return false;
 }
 
+Future<String> getUserId() async {
+  await ensureLoggedIn();
+  return (await _auth.currentUser()).uid;
+}
+
 

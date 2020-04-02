@@ -54,7 +54,7 @@ class _State extends State<MyApp> {
   final FirebaseApp app;
   final FirebaseDatabase database;
 
-  String _status;
+  var _status;
   String _location;
   StreamSubscription<Event> _counterSubscription;
 
@@ -94,31 +94,17 @@ class _State extends State<MyApp> {
     }
   }
 
-  void _addData() async {
-    fbDatabase.addData(_username);
+  void _findData(String key) async {
+    Map<dynamic, dynamic> value = await fbDatabase.findData(_username, key);
     setState(() {
-      _status = 'Data added';
+      _status = value;
     });
   }
 
-  void _removeData() async {
-    fbDatabase.removeData(_username);
+  void _findRange(String key) async {
+    Map<dynamic, dynamic> value = await fbDatabase.findRange(_username, key);
     setState(() {
-      _status = 'Data removed';
-    });
-  }
-
-  void _setData(String key, String value) async {
-    fbDatabase.setData(_username, key, value);
-    setState(() {
-      _status = 'Data set';
-    });
-  }
-
-  void _updateData(String key, String value) async {
-    fbDatabase.updateData(_username, key, value);
-    setState(() {
-      _status = 'Data updated';
+      _status = value;
     });
   }
 
@@ -150,10 +136,7 @@ class _State extends State<MyApp> {
         child: new Center(
           child: new Column(
             children: <Widget>[
-              new Text(_status),
-              new Visibility(
-                child: new Text('${fbDatabase.error}'),
-                visible: fbDatabase.error != null,),
+              new Text(_status.toString()),
               new RaisedButton(
                 onPressed: _signOut,
                 child: new Text('Sign out'),
@@ -173,26 +156,12 @@ class _State extends State<MyApp> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   new RaisedButton(
-                    onPressed: _addData,
-                    child: new Text('Add Data'),
+                    onPressed: () => _findData('Key2'),
+                    child: new Text('Find Data'),
                   ),
                   new RaisedButton(
-                    onPressed: _removeData,
-                    child: new Text('Remove Data'),
-                  ),
-                ],
-              ),
-              new Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  new RaisedButton(
-                    onPressed: () => _setData('Key2', 'This is a set value'),
-                    child: new Text('Set Data'),
-                  ),
-                  new RaisedButton(
-                    onPressed: () => _updateData('Key2', 'Key2 has been updated'),
-                    child: new Text('Update Data'),
+                    onPressed: () => _findRange('Key2'),
+                    child: new Text('Find Range'),
                   ),
                 ],
               ),

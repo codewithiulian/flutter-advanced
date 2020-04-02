@@ -17,61 +17,23 @@ Future<Null> init(FirebaseDatabase database) async {
   database.setPersistenceCacheSizeBytes(10000000);
 }
 
-Future<int> getCounter() async {
-  int value;
-  await counterRef.once().then((DataSnapshot snapshot) {
-    print('Connected to DB and read ${snapshot.value}');
-    value = snapshot.value;
-  });
+Future<Map<dynamic, dynamic>> findData(String user, String key) async {
+  DatabaseReference _messageRef = FirebaseDatabase.instance.reference()
+      .child('messages/$user');
+  Map<dynamic, dynamic> value;
+  Query query = _messageRef.equalTo(value, key: key);
+  await query.once().then((snapshot) => value = snapshot.value);
+
   return value;
 }
 
-Future<Null> setCounter(int value) async {
-  TransactionResult transactionResult =
-    await counterRef.runTransaction((MutableData mutableData) async {
-      mutableData.value = value;
-      return mutableData;
-    });
-
-  if(transactionResult.committed) {
-    print('Saved the value to the database');
-  } else {
-    print('Transaction not commited!');
-    if(transactionResult.error != null) {
-      print(transactionResult.error.message);
-    }
-  }
+Future<Map<dynamic, dynamic>> findRange(String user, String key) async {
+  DatabaseReference _messageRef = FirebaseDatabase.instance.reference()
+      .child('messages/$user');
+  Map<dynamic, dynamic> value;
+  Query query = _messageRef.endAt(value, key: key);
+  await query.once().then((snapshot) => value = snapshot.value);
+  print(value);
+  return value;
 }
 
-Future<Null> addData(String user) async {
-  DatabaseReference messageRef =
-    FirebaseDatabase.instance.reference().child('messages/$user');
-  for(int i = 0; i < 20; i++) {
-    messageRef
-        .update(<String, String>{'Key${i.toString()}' : 'Body${i.toString()}'});
-  }
-}
-
-Future<Null> removeData(String user) async {
-  DatabaseReference messageRef =
-  FirebaseDatabase.instance.reference().child('messages/$user');
-  for(int i = 0; i < 20; i++) {
-    await messageRef.remove();
-  }
-}
-
-Future<Null> setData(String user, String key, String value) async {
-  DatabaseReference messageRef =
-  FirebaseDatabase.instance.reference().child('messages/$user');
-  for(int i = 0; i < 20; i++) {
-    messageRef.set(<String, String>{key : value});
-  }
-}
-
-Future<Null> updateData(String user, String key, String value) async {
-  DatabaseReference messageRef =
-  FirebaseDatabase.instance.reference().child('messages/$user');
-  for(int i = 0; i < 20; i++) {
-    messageRef.update(<String, String>{key : value});
-  }
-}
